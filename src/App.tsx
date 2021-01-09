@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useReducer } from 'react'
 import './App.css';
+import ListItem from './Components/ListItem'
+import TodoListInput from './Components/TodoListInput'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export interface Data  {
+  title: string;
+  id: string;
+}
+export type Action = 
+  | {type: "add", payload: { title: string, id: string }}
+  | {type: "remove", payload: { title: string, id: string }}
+
+const ACTIONS = {
+  ADD: "add",
+  REMOVE: "remove",
+  EDIT: "edit"
+}
+const UpdateList = (state: Data[], action: Action): Data[] => {
+  switch (action.type) {
+    case ACTIONS.ADD:
+      return [...state, {title: action.payload.title, id: action.payload.id}]
+    case ACTIONS.REMOVE:
+      return state.filter((item) => action.payload.id !== item.id);
+    case ACTIONS.EDIT:
+      return state
+    default:
+      return state
+  }
+}
+const App = () => {
+  const [list, dispatch] = useReducer(UpdateList, [])
+  return(
+    <>
+      <TodoListInput dispatch={dispatch}/>
+      {Object.keys(list).length ? <ListItem list={list} dispatch={dispatch} /> : <h1>There's no tasks</h1>}
+    </>
+  )
 }
 
-export default App;
+export default App
